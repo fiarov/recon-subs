@@ -1,0 +1,131 @@
+name: Crtsh Subdomain Monitor
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 2 # Prevents rate-limiting on crt.sh
+      matrix:
+        domain:
+          - dell.com # Bc
+          - nintendo-europe.com # H1
+          - nintendo.at
+          - nintendo.be
+          - nintendo.ch
+          - nintendo.co.uk
+          - nintendo.de
+          - nintendo.es
+          - nintendo.eu
+          - nintendo.fr
+          - nintendo.it
+          - nintendo.lu
+          - nintendo.nl
+          - nintendo.pt
+          - nintendowifi.net
+          - paymentweb.nintendo.com
+          - dpdgroup.co.uk
+          - mercury.com
+          - deriv.ae
+          - payfit.com
+          - payfit.fr
+          - payfit.io
+          - payfit.net
+          - payfit.tech
+          - blocket.se
+          - dba.dk
+          - ecgh.dk
+          - finn.no
+          - finntech.no
+          - m10s.io
+          - tori.fi
+          - vend.com
+          - vend.dk
+          - vend.fi
+          - vend.no
+          - vend.se
+          - dpgmedia.be # Inti
+          - dpgmedia.nl
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go (required by httpx-action)
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Query crt.sh and find new subdomains
+        id: crt
+        run: |
+          DOMAIN="${{ matrix.domain }}"
+          KNOWN_FILE="data/${DOMAIN}.txt"
+          mkdir -p data
+          touch "$KNOWN_FILE"
+
+          # Fetch JSON, extract SANs/CNs, strip wildcards, lowercase, and deduplicate
+          curl -s --retry 3 "https://crt.sh/?q=%25.${DOMAIN}&output=json" \
+            | jq -r '.[].name_value' \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/^\*\.//' \
+            | sort -u > fetched.txt
+
+          # Compare fetched subdomains against the existing baseline list
+          sort -u "$KNOWN_FILE" -o "$KNOWN_FILE"
+          comm -23 fetched.txt "$KNOWN_FILE" > new_subs.txt
+
+          if [ -s new_subs.txt ]; then
+            echo "has_new=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_new=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Probe new subdomains with httpx
+        if: steps.crt.outputs.has_new == 'true'
+        uses: projectdiscovery/httpx-action@main
+        with:
+          list: new_subs.txt
+          output: live_subs.txt
+          flags: "-silent -mc 200,301,302,401,403 -no-color"
+
+      - name: Send Slack alert for live subdomains
+        if: steps.crt.outputs.has_new == 'true'
+        env:
+          SLACK_WEBHOOK_DOMAINS: ${{ secrets.SLACK_WEBHOOK_DOMAINS }}
+        run: |
+          if [ -s live_subs.txt ]; then
+            RESULTS=$(cat live_subs.txt)
+            PAYLOAD=$(jq -n \
+              --arg domain "${{ matrix.domain }}" \
+              --arg results "$RESULTS" \
+              '{text: ("*🔎 Crtsh: New live subdomains detected for " + $domain + ":*\n```" + \$results + "```")}')
+
+            curl -s -X POST -H 'Content-type: application/json' \
+              --data "$PAYLOAD" \
+              "$SLACK_WEBHOOK_DOMAINS"
+          fi
+
+      - name: Update baseline list in repository
+        if: steps.crt.outputs.has_new == 'true'
+        run: |
+          DOMAIN="${{ matrix.domain }}"
+          cat new_subs.txt >> "data/${DOMAIN}.txt"
+          sort -u "data/${DOMAIN}.txt" -o "data/${DOMAIN}.txt"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "data/${DOMAIN}.txt"
+          git commit -m "chore: update known subdomains for ${DOMAIN}" || exit 0
+          
+          # Pull with rebase to avoid race conditions across matrix jobs
+          git pull --rebase
+          git push
