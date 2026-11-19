@@ -95,7 +95,7 @@ jobs:
         with:
           list: new_subs.txt
           output: live_subs.txt
-          flags: "-silent -mc 200,301,302,401,403 -no-color"
+          flags: "-silent -mc 200,301,302,307,401,403,500 -no-color"
 
       - name: Send Slack alert for live subdomains
         if: steps.crt.outputs.has_new == 'true'
