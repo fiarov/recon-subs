@@ -163,7 +163,7 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "New Subdomains Discovered",
+              "text": "Subfinder: New Subdomains Discovered",
               "blocks": [
                 {
                   "type": "header",
