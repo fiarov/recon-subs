@@ -57,7 +57,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
+
+      - name: Cache
+        uses: actions/cache@v4
 
       - name: Setup Go (required by httpx-action)
         uses: actions/setup-go@v5
