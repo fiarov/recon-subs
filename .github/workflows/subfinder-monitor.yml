@@ -1,0 +1,193 @@
+name: Subfinder Subdomain Monitoring
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  enumerate:
+    name: Enumerate (${{ matrix.domain }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        domain:
+          - dell.com # Bc
+          - nintendo-europe.com # H1
+          - nintendo.at
+          - nintendo.be
+          - nintendo.ch
+          - nintendo.co.uk
+          - nintendo.de
+          - nintendo.es
+          - nintendo.eu
+          - nintendo.fr
+          - nintendo.it
+          - nintendo.lu
+          - nintendo.nl
+          - nintendo.pt
+          - nintendowifi.net
+          - paymentweb.nintendo.com
+          - dpdgroup.co.uk
+          - mercury.com
+          - deriv.ae
+          - payfit.com
+          - payfit.fr
+          - payfit.io
+          - payfit.net
+          - payfit.tech
+          - blocket.se
+          - dba.dk
+          - ecgh.dk
+          - finn.no
+          - finntech.no
+          - m10s.io
+          - tori.fi
+          - vend.com
+          - vend.dk
+          - vend.fi
+          - vend.no
+          - vend.se
+          - dpgmedia.be # Inti
+          - dpgmedia.nl
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+    
+      - name: Run Subfinder
+        uses: projectdiscovery/subfinder-action@main
+        with:
+          domain: ${{ matrix.domain }}
+          output: ${{ matrix.domain }}.txt
+          flags: -silent -all
+
+      - name: Normalize scan output
+        run: |
+          touch "${{ matrix.domain }}.txt"
+          tr '[:upper:]' '[:lower:]' < "${{ matrix.domain }}.txt" | sed '/^[[:space:]]*$/d' | sort -u > "clean_${{ matrix.domain }}.txt"
+
+      - name: Upload scan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-${{ matrix.domain }}
+          path: clean_${{ matrix.domain }}.txt
+          retention-days: 1
+
+  diff-and-notify:
+    name: Diff Baseline, Commit & Alert
+    needs: enumerate
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all scan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Compare against baseline and update
+        id: diff
+        run: |
+          mkdir -p baselines
+          NEW_FOUND=false
+          SUMMARY=""
+
+          for scan_file in ./artifacts/scan-*/clean_*.txt; do
+            [ -e "$scan_file" ] || continue
+
+            filename=$(basename "$scan_file")
+            domain="${filename#clean_}"
+            domain="${domain%.txt}"
+            baseline_file="baselines/${domain}.txt"
+
+            # Create an empty baseline if monitoring a new root domain
+            touch "$baseline_file"
+            sort -u "$baseline_file" -o "$baseline_file"
+
+            # Find lines present in scan_file that are missing from baseline_file
+            new_subs=$(comm -23 "$scan_file" "$baseline_file")
+
+            if [ -n "$new_subs" ]; then
+              NEW_FOUND=true
+              count=$(echo "$new_subs" | wc -l | tr -d ' ')
+
+              # Merge new subdomains into the tracked baseline
+              cat "$baseline_file" "$scan_file" | sort -u > "${baseline_file}.tmp"
+              mv "${baseline_file}.tmp" "$baseline_file"
+
+              # Format block for Slack
+              formatted_subs=$(echo "$new_subs" | head -n 15 | sed 's/^/• /')
+              if [ "$count" -gt 15 ]; then
+                formatted_subs="${formatted_subs}"$'\n'"• _...and $((count - 15)) more_"
+              fi
+
+              SUMMARY="${SUMMARY}*${domain}* (${count} new):"$'\n'"${formatted_subs}"$'\n\n'
+            fi
+          done
+
+          echo "new_found=${NEW_FOUND}" >> "$GITHUB_OUTPUT"
+
+          # Safely export multiline summary to GITHUB_OUTPUT
+          {
+            echo "summary<<EOF"
+            printf "%b" "$SUMMARY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push updated baselines
+        if: steps.diff.outputs.new_found == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baselines/
+          git commit -m "chore(recon): update subdomain baselines [skip ci]"
+          git push
+
+      - name: Send Slack alert
+        if: steps.diff.outputs.new_found == 'true'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_DOMAINS }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "New Subdomains Discovered",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🔎 Subfinder: New Subdomains Discovered",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ${{ toJSON(steps.diff.outputs.summary) }}
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "Repository: <${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}> | <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>"
+                    }
+                  ]
+                }
+              ]
+            }
