@@ -1,0 +1,10 @@
+account.vend.no
+id.privacysettings.vend.no
+login.vend.no
+privacysettings.vend.no
+session.login.vend.no
+www.account.vend.no
+www.id.privacysettings.vend.no
+www.login.vend.no
+www.privacysettings.vend.no
+www.vend.no

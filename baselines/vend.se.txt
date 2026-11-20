@@ -1,0 +1,12 @@
+account.vend.se
+beta.vend.se
+foto.vend.se
+id.privacysettings.vend.se
+login.vend.se
+privacysettings.vend.se
+session.login.vend.se
+www.beta.vend.se
+www.id.privacysettings.vend.se
+www.login.vend.se
+www.privacysettings.vend.se
+www.vend.se

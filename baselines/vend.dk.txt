@@ -1,0 +1,13 @@
+account.vend.dk
+admin.vend.dk
+id.privacysettings.vend.dk
+login.vend.dk
+mail.vend.dk
+privacysettings.vend.dk
+session.login.vend.dk
+www.account.vend.dk
+www.id.privacysettings.vend.dk
+www.login.vend.dk
+www.mail.vend.dk
+www.privacysettings.vend.dk
+www.vend.dk
