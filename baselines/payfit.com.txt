@@ -250,6 +250,7 @@ qonto.payfit.com
 quiz-connaissances-paie.payfit.com
 recovery.payfit.com
 ruportal7.access.payfit.com
+salesforce-api.payfit.com
 scribe-mail.payfit.com
 secure.payfit.com
 security.payfit.com

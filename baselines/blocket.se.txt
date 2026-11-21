@@ -138,6 +138,7 @@ dns1.horizontal.svc.blocket.se
 dns2.blocket.se
 e.blocket.se
 eas.blocket.se
+eas0.blocket.se
 edge.apps-gw-poc.horizontal.svc.blocket.se
 ehandel.blocket.se
 elasticsearch-int.es.svc.dev.blocket.se
@@ -381,6 +382,7 @@ pg-aurora-seo-api.horizontal-pg.blocket.se
 pg-aurora-seo-api.horizontal-pg.dev.blocket.se
 pg.blocket.se
 pg.dev.blocket.se
+platform-es.blocket.se
 platform-es.dev.blocket.se
 platform.int.dev.blocket.se
 platform.svc.blocket.se

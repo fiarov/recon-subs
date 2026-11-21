@@ -9,6 +9,7 @@
 221.nintendo.at
 251.nintendo.at
 26.nintendo.at
+3ds.nintendo.at
 57.nintendo.at
 5s.api.boilerplate.nintendo.at
 86.nintendo.at
@@ -30,6 +31,7 @@ alexa.nintendo.at
 alfredq.workflows.nintendo.at
 algorithmse.nintendo.at
 algowiki.nintendo.at
+alinkbetweenworlds.nintendo.at
 amc.i.affected.by.meltdown.nintendo.at
 amicontained.nintendo.at
 amiibo.nintendo.at
@@ -299,6 +301,7 @@ felony.nintendo.at
 ffbld01-uk-ibm-com.nintendo.at
 fighter.nintendo.at
 filestore.nintendo.at
+fireemblem.nintendo.at
 first.decentralized.application.python.nintendo.at
 fixes.nintendo.at
 flickre.sdk.nintendo.at
@@ -323,6 +326,7 @@ functionalo.reactive.programming.nintendo.at
 gameartprinciples.nintendo.at
 gamedeve.pl.nintendo.at
 gamedevtemplates.nintendo.at
+gc.nintendo.at
 gehirnjogging.nintendo.at
 geonbite.ui.nintendo.at
 gevent.nintendo.at
@@ -384,6 +388,7 @@ kibana.nintendo.at
 kirby.nintendo.at
 kirbystaralliesy.nintendo.at
 layout.nintendo.at
+layton.nintendo.at
 learning.book.nintendo.at
 lebanon.nintendo.at
 letsencrypt.nginx.proxy.companion.nintendo.at
@@ -396,9 +401,13 @@ machine.learning.tutorials.nintendo.at
 macvars.nintendo.at
 magit.nintendo.at
 majorasmask.nintendo.at
+mario.nintendo.at
+mario30.nintendo.at
+marioandluigi.nintendo.at
 mariopartythetop100s.nintendo.at
 markupfield.nintendo.at
 mesh.nintendo.at
+metroid.nintendo.at
 metroiddread.nintendo.at
 microservices.nintendo.at
 miitopiau.nintendo.at
@@ -411,8 +420,12 @@ nativescript.nintendo.at
 newsupermariobrosu-deluxek.nintendo.at
 newtons.laws.nintendo.at
 ng.nintendo.at
+nintendo2ds.nintendo.at
+nintendo3ds.nintendo.at
+nintendo3dsxl.nintendo.at
 nintendodirect.nintendo.at
 nos.nintendo.at
+npfc.nintendo.at
 ocean.nintendo.at
 onboarding.nintendo.at
 openwhisk.nintendo.at
@@ -421,6 +434,7 @@ outage.nintendo.at
 patrimonio.nintendo.at
 persei.nintendo.at
 photos0.nintendo.at
+pikmin4.nintendo.at
 pikminm.nintendo.at
 platform.nintendo.at
 pokemonquest.nintendo.at
@@ -467,6 +481,7 @@ subscriptions.nintendo.at
 supermario3dworld.nintendo.at
 supermarioodysseys.nintendo.at
 support.nintendo.at
+switch.nintendo.at
 system.js.nintendo.at
 table.nintendo.at
 tde.nintendo.at
@@ -480,6 +495,8 @@ thewonderful101.nintendo.at
 theworldendswithyoum.nintendo.at
 timesketch.nintendo.at
 to.rest.api.nintendo.at
+tomodachi.nintendo.at
+triforceheroes.nintendo.at
 ts.nintendo.at
 tw.nintendo.at
 unity.nintendo.at
@@ -519,4 +536,5 @@ ys.nintendo.at
 yuzu.nintendo.at
 zabbix.nintendo.at
 zheng.nintendo.at
+zone.nintendo.at
 zpush.nintendo.at

@@ -150,6 +150,7 @@ dev.vulcan.m10s.io
 devk.privacy-broker.m10s.io
 devo.privacy-settings.m10s.io
 devy.security.m10s.io
+df-dev-01.eks.m10s.io
 df-pro-2.eks.m10s.io
 dk.dev.privacy-settings.m10s.io
 dk.pre.privacy-settings.m10s.io
@@ -505,6 +506,7 @@ svc.dev.shared.m10s.io
 svc.prod.shared.m10s.io
 tableau.m10s.io
 team-agent.m10s.io
+teamcity.internal.smd.m10s.io
 teamcity.smd.m10s.io
 telegraf.infra.dev.carweb.m10s.io
 telegraf.infra.pro.carweb.m10s.io
